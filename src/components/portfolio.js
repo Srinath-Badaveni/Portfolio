@@ -1,0 +1,252 @@
+import React, { useState, useEffect, useRef } from "react";
+import { Menu, X, Sun, Moon } from "lucide-react";
+import Home from "./Home";
+import About from "./About";
+import Projects from "./Projects";
+import Skills from "./Skills";
+import Experience from "./Experience";
+import Contact from "./Contact";
+
+const Portfolio = () => {
+  const [activeSection, setActiveSection] = useState("home");
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const isScrolling = useRef(false);
+  const [darkMode, setDarkMode] = useState(() => {
+    const savedTheme = localStorage.getItem("theme");
+    return savedTheme ? savedTheme === "dark" : true;
+  });
+
+  // Apply theme on toggle
+  useEffect(() => {
+    const theme = darkMode ? "dark" : "light";
+    document.documentElement.setAttribute("data-theme", theme);
+    localStorage.setItem("theme", theme);
+  }, [darkMode]);
+
+  const toggleTheme = () => setDarkMode(!darkMode);
+
+  const navItems = [
+    { id: "home", label: "Home" },
+    { id: "about", label: "About" },
+    { id: "projects", label: "Work" },
+    { id: "skills", label: "Expertise" },
+    { id: "experience", label: "Journey" },
+    { id: "contact", label: "Contact" },
+  ];
+
+  // Scroll-spy: update active nav based on which section is visible
+  useEffect(() => {
+    const sectionIds = [
+      "home",
+      "about",
+      "projects",
+      "skills",
+      "experience",
+      "contact",
+    ];
+
+    const handleIntersect = (entries) => {
+      if (isScrolling.current) return;
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          setActiveSection(entry.target.id);
+        }
+      });
+    };
+
+    const observerOptions = {
+      root: null,
+      rootMargin: "-40% 0px -40% 0px",
+      threshold: 0,
+    };
+
+    const observers = [];
+    sectionIds.forEach((id) => {
+      const el = document.getElementById(id);
+      if (el) {
+        const obs = new IntersectionObserver(handleIntersect, observerOptions);
+        obs.observe(el);
+        observers.push(obs);
+      }
+    });
+
+    return () => observers.forEach((obs) => obs.disconnect());
+  }, []);
+
+  // Animate sections on scroll into view
+  useEffect(() => {
+    const animatedEls = document.querySelectorAll(".section-animate");
+    const animObs = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("section-visible");
+          }
+        });
+      },
+      { threshold: 0.05 },
+    );
+
+    animatedEls.forEach((el) => animObs.observe(el));
+    return () => animObs.disconnect();
+  }, []);
+
+  // Nav click: smooth scroll to section
+  const scrollToSection = (id) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    isScrolling.current = true;
+    setActiveSection(id);
+    setIsMenuOpen(false);
+    el.scrollIntoView({ behavior: "smooth", block: "start" });
+    setTimeout(() => {
+      isScrolling.current = false;
+    }, 1000);
+  };
+
+  return (
+    <div
+      className={`min-h-screen transition-colors duration-300 ${darkMode ? "dark" : "light"}`}
+    >
+      {/* Navigation Bar - Floating Pill Design */}
+      <div className="fixed top-6 left-0 right-0 z-50 flex justify-center items-start pointer-events-none px-4">
+        <div
+          className={`pointer-events-auto backdrop-blur-xl border rounded-full p-2 flex items-center shadow-2xl transition-all duration-300 hover:scale-[1.02]
+                    ${
+                      darkMode
+                        ? "bg-black/50 border-white/10 hover:bg-black/70"
+                        : "bg-white/80 border-black/5 hover:bg-white/90 shadow-lg"
+                    }
+                `}
+        >
+          {/* Logo Pill */}
+          <button
+            onClick={() => scrollToSection("home")}
+            className={`rounded-full px-4 py-2 flex items-center gap-2 mr-2 border transition-colors
+                            ${
+                              darkMode
+                                ? "bg-zinc-900/80 border-white/5 hover:bg-zinc-800"
+                                : "bg-gray-100 border-black/5 hover:bg-gray-200"
+                            }
+                        `}
+          >
+            <span
+              className={`font-display font-bold text-lg ${darkMode ? "text-white" : "text-black"}`}
+            >
+              S<span className="text-accent">.</span>
+            </span>
+          </button>
+
+          {/* Desktop Menu */}
+          <div className="hidden md:flex items-center gap-1 px-2">
+            {navItems.map((item) => (
+              <button
+                key={item.id}
+                onClick={() => scrollToSection(item.id)}
+                className={`px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-all duration-300 ${
+                  activeSection === item.id
+                    ? darkMode
+                      ? "bg-yellow-400 text-black shadow-xl scale-105"
+                      : "bg-green-700 text-white shadow-lg scale-105"
+                    : darkMode
+                      ? "text-gray-400 hover:text-white hover:bg-white/5"
+                      : "text-gray-600 hover:text-black hover:bg-black/5"
+                }`}
+              >
+                {item.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Divider */}
+          <div
+            className={`w-px h-6 mx-2 hidden md:block ${darkMode ? "bg-white/10" : "bg-black/10"}`}
+          ></div>
+
+          {/* Actions */}
+          <div className="flex items-center gap-2">
+            {/* Theme Toggle */}
+            <button
+              onClick={toggleTheme}
+              className={`p-3 rounded-full transition-colors ${
+                darkMode
+                  ? "hover:bg-white/10 text-gray-400 hover:text-accent"
+                  : "hover:bg-black/5 text-gray-500 hover:text-accent"
+              }`}
+              aria-label="Toggle Theme"
+            >
+              {darkMode ? <Sun size={18} /> : <Moon size={18} />}
+            </button>
+
+            {/* Mobile Menu Button */}
+            <button
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className={`md:hidden p-3 rounded-full transition-colors ${
+                darkMode
+                  ? "hover:bg-white/10 text-white"
+                  : "hover:bg-black/5 text-black"
+              }`}
+            >
+              {isMenuOpen ? <X size={20} /> : <Menu size={20} />}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Mobile Menu Overlay */}
+      {isMenuOpen && (
+        <div
+          className={`md:hidden fixed inset-0 z-40 pt-32 px-6 backdrop-blur-xl ${
+            darkMode ? "bg-black/95" : "bg-white/95"
+          }`}
+        >
+          <div className="flex flex-col space-y-4">
+            {navItems.map((item) => (
+              <button
+                key={item.id}
+                onClick={() => scrollToSection(item.id)}
+                className={`text-left text-2xl font-bold font-display transition-all p-4 rounded-xl border
+                                ${
+                                  activeSection === item.id
+                                    ? "text-accent border-accent/20 bg-accent/5"
+                                    : darkMode
+                                      ? "text-gray-400 border-white/5 hover:text-white hover:bg-white/5"
+                                      : "text-gray-500 border-black/5 hover:text-black hover:bg-black/5"
+                                }`}
+              >
+                {item.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* All Sections on Single Page */}
+      <main>
+        <section id="home" className="section-animate section-visible">
+          <Home
+            setActiveSection={(id) => scrollToSection(id)}
+            darkMode={darkMode}
+          />
+        </section>
+        <section id="about" className="section-animate">
+          <About />
+        </section>
+        <section id="projects" className="section-animate">
+          <Projects />
+        </section>
+        <section id="skills" className="section-animate">
+          <Skills />
+        </section>
+        <section id="experience" className="section-animate">
+          <Experience />
+        </section>
+        <section id="contact" className="section-animate">
+          <Contact />
+        </section>
+      </main>
+    </div>
+  );
+};
+
+export default Portfolio;
