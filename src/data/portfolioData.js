@@ -11,7 +11,7 @@ export const personalInfo = {
   email: "badavenisrinath@gmail.com",
   phone: "+91 9059875072",
   availability: "Currently available for internships and freelance projects",
-  profileImage: "/images/profile/profile.jpg",
+  profileImage: "/images/profile/profile1.jpg",
 
   social: {
     github: "https://github.com/Srinath-Badaveni",
@@ -287,15 +287,12 @@ export const skills = {
     "WebSockets",
     "JWT Authentication",
   ],
-  databases: ["MongoDB", "SQL", "Database Design", "Query Optimization"],
-  tools: ["Git/GitHub", "VS Code", "Postman", "Oracle Cloud", "npm"],
+  databases: ["MongoDB", "SQL", "Database Design"],
+  tools: ["Git/GitHub", "VS Code", "Postman", "Oracle Cloud"],
   competencies: [
     "Data Structures & Algorithms",
-    "System Design & Architecture",
     "Debugging & Optimization",
-    "SEO Best Practices",
     "Team Collaboration",
-    "Agile Workflows",
   ],
 };
 
@@ -323,14 +320,6 @@ export const achievements = [
       "Solved 200+ Data Structures and Algorithms problems on NXT Wave platform",
     year: "2024",
     icon: "code",
-  },
-  {
-    id: 4,
-    title: "Open Source Contributor",
-    description:
-      "Active contributor to open-source projects, collaborating with global developers",
-    year: "2024",
-    icon: "globe",
   },
 ];
 
@@ -365,10 +354,7 @@ export const certifications = [
 export const timeline = [
   {
     year: "2026",
-    events: [
-      "CareConnect Upgrade - Production Ready Healthcare App",
-      "Web Service Implementation",
-    ],
+    events: ["CareConnect - Healthcare App", "Web Service Implementation"],
     gradient: "from-emerald-500 to-teal-600",
   },
   {
@@ -377,7 +363,6 @@ export const timeline = [
       "Oracle Cloud Infrastructure 2025 Certified Generative AI Professional",
       "FinTrack Application Launch",
       "200+ DSA Problems Milestone",
-      "Front End Development Certification",
     ],
     gradient: "from-cyan-500 to-blue-600",
   },
@@ -388,8 +373,9 @@ export const timeline = [
       "1st Place - Coding Competition (2x)",
       "Rank 92 - DSA CodeVerse Contest #7",
       "Movies Hub & Tourist Places Applications",
+      "Front End Development Certification",
+
       "Cloud Foundations Certification",
-      "Open Source Contributions",
     ],
     gradient: "from-blue-500 to-purple-600",
   },
@@ -398,7 +384,6 @@ export const timeline = [
     events: [
       "Started B.Tech in Computer Science",
       "Completed Intermediate - 90.8%",
-
       "Amazon Clone Project",
     ],
     gradient: "from-purple-500 to-pink-600",
@@ -432,15 +417,12 @@ export const stats = [
 export const availableFor = [
   "Web Development Internships",
   "Freelance Projects",
-  "Open Source Collaborations",
-  "Technical Consulting",
 ];
 
 export const currentFocus = [
   "🎓 Pursuing B.Tech in Computer Science (CGPA: 8.3)",
   "💻 Building full-stack applications with MERN stack",
-  "🤝 Contributing to open-source projects",
   "☁️ Exploring cloud technologies and generative AI",
   "🏆 Competing in coding challenges",
-  "📚 Mastering DSA (200+ problems solved)",
+  "📚 Mastering DSA",
 ];

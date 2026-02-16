@@ -102,7 +102,7 @@ const Home = ({ setActiveSection, darkMode }) => {
         {/* ═══ HERO SECTION ═══ */}
         <div className="flex flex-col justify-start items-start text-left min-h-screen pt-4 pb-4">
           {/* Main Headings */}
-          <div className="space-y-6 max-w-7xl w-full">
+          <div className="space-y-6 max-w-7xl w-full relative">
             {/* Intro Label */}
             <h2
               className="text-sm md:text-base font-bold tracking-[0.3em] uppercase mb-6 animate-fade-in-up flex items-center gap-4"
@@ -114,6 +114,28 @@ const Home = ({ setActiveSection, darkMode }) => {
               <span className="w-12 h-[2px] bg-current opacity-50"></span>
               Hi, I'm Srinath Badaveni
             </h2>
+
+            <div
+              className={`absolute right-0 -top-12 hidden md:block rounded-full overflow-hidden shadow-2xl transition-transform duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] hover:scale-125 cursor-pointer ${
+                !darkMode ? "border-4 border-gray-200" : ""
+              }`}
+              style={{
+                width: "14rem",
+                height: "14rem",
+              }}
+            >
+              <img
+                src={personalInfo.profileImage}
+                alt={personalInfo.name}
+                className="w-full h-full object-cover"
+              />
+            </div>
+
+            {/* Mobile Profile Photo - Inline/Different spot or hidden? 
+                  User said "top right to fill that empty space", usually implies desktop. 
+                  On mobile, spaces are tight. I'll hide it on mobile for now to avoid breaking layout 
+                  as per "dont disturb a single component". 
+              */}
 
             {/* Main Headline */}
             <h1
@@ -142,7 +164,9 @@ const Home = ({ setActiveSection, darkMode }) => {
               {/* Line 3: Accent Style */}
               <span
                 className="block mt-[-0.2em]"
-                style={{ color: darkMode ? "#FCBF49" : "var(--color-accent)" }}
+                style={{
+                  color: darkMode ? "#FCBF49" : "var(--color-accent)",
+                }}
               >
                 Experiences.
               </span>

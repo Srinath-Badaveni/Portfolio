@@ -587,8 +587,7 @@ const Contact = () => {
                 gap: "0.35rem",
               }}
             >
-              Built with <Heart size={12} style={{ color: "#ef4444" }} /> &
-              React
+              Built with <Heart size={12} style={{ color: "#ef4444" }} />
             </p>
           </div>
         </footer>
