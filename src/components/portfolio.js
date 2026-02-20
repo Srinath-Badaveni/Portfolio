@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Menu, X, Sun, Moon } from "lucide-react";
+import { Menu, X, Sun, Moon, Volume2, VolumeX } from "lucide-react";
 import Home from "./Home";
 import About from "./About";
 import Projects from "./Projects";
@@ -10,7 +10,15 @@ import Contact from "./Contact";
 const Portfolio = () => {
   const [activeSection, setActiveSection] = useState("home");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isMusicPlaying, setIsMusicPlaying] = useState(false);
+  const [volume, setVolume] = useState(0.2);
+  const [lastVolume, setLastVolume] = useState(0.2);
+  const [isVolumeOpen, setIsVolumeOpen] = useState(false);
+  const [isVolumeVisible, setIsVolumeVisible] = useState(false);
+  const volumeTimeoutRef = useRef(null);
+  const navContainerRef = useRef(null);
   const isScrolling = useRef(false);
+  const audioRef = useRef(null);
   const [darkMode, setDarkMode] = useState(() => {
     const savedTheme = localStorage.getItem("theme");
     return savedTheme ? savedTheme === "dark" : true;
@@ -24,6 +32,101 @@ const Portfolio = () => {
   }, [darkMode]);
 
   const toggleTheme = () => setDarkMode(!darkMode);
+
+  // Background Music setup
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.volume = volume;
+    }
+  }, [volume]);
+
+  const handleVolumeChange = (e) => {
+    const newVolume = parseFloat(e.target.value);
+    setVolume(newVolume);
+    if (newVolume > 0) {
+      setLastVolume(newVolume);
+    }
+    if (audioRef.current) {
+      audioRef.current.volume = newVolume;
+      if (newVolume === 0 && isMusicPlaying) {
+        audioRef.current.pause();
+        setIsMusicPlaying(false);
+      } else if (newVolume > 0 && !isMusicPlaying) {
+        audioRef.current.play().catch(console.error);
+        setIsMusicPlaying(true);
+      }
+    }
+  };
+
+  const toggleMusic = () => {
+    if (isMusicPlaying || volume > 0) {
+      // Mute
+      audioRef.current.pause();
+      setIsMusicPlaying(false);
+      setVolume(0);
+    } else {
+      // Unmute/Play
+      const playVol = lastVolume > 0 ? lastVolume : 0.2;
+      setVolume(playVol);
+      audioRef.current.volume = playVol;
+      audioRef.current.play().catch(console.error);
+      setIsMusicPlaying(true);
+    }
+  };
+
+  // Close Volume auto-timeout and click outside
+  useEffect(() => {
+    // Reset timer function
+    const resetTimer = () => {
+      if (volumeTimeoutRef.current) clearTimeout(volumeTimeoutRef.current);
+      if (isVolumeOpen) {
+        volumeTimeoutRef.current = setTimeout(() => {
+          setIsVolumeOpen(false);
+        }, 4000);
+      }
+    };
+
+    // Click outside handler
+    const handleClickOutside = (event) => {
+      if (
+        navContainerRef.current &&
+        !navContainerRef.current.contains(event.target)
+      ) {
+        setIsVolumeOpen(false);
+      }
+    };
+
+    if (isVolumeOpen) {
+      setIsVolumeVisible(true);
+      resetTimer();
+      document.addEventListener("mousedown", handleClickOutside);
+      document.addEventListener("touchstart", handleClickOutside);
+      // Listen for any interactions to reset the timer
+      window.addEventListener("mousemove", resetTimer);
+      window.addEventListener("keydown", resetTimer);
+    } else {
+      // Delay unmounting from DOM to allow fade out transition
+      const fadeOutTimeout = setTimeout(() => setIsVolumeVisible(false), 300);
+      return () => clearTimeout(fadeOutTimeout);
+    }
+
+    return () => {
+      if (volumeTimeoutRef.current) clearTimeout(volumeTimeoutRef.current);
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("touchstart", handleClickOutside);
+      window.removeEventListener("mousemove", resetTimer);
+      window.removeEventListener("keydown", resetTimer);
+    };
+  }, [isVolumeOpen]);
+
+  // Extend volume interaction
+  const handleVolumeInteraction = (e) => {
+    handleVolumeChange(e);
+    if (volumeTimeoutRef.current) {
+      clearTimeout(volumeTimeoutRef.current);
+      volumeTimeoutRef.current = setTimeout(() => setIsVolumeOpen(false), 4000);
+    }
+  };
 
   const navItems = [
     { id: "about", label: "About" },
@@ -110,7 +213,8 @@ const Portfolio = () => {
       {/* Navigation Bar - Floating Pill Design */}
       <div className="fixed top-6 left-0 right-0 z-50 flex justify-center items-start pointer-events-none px-4">
         <div
-          className={`pointer-events-auto backdrop-blur-xl border rounded-full p-2 flex items-center shadow-2xl transition-all duration-300 hover:scale-[1.02]
+          ref={navContainerRef}
+          className={`relative pointer-events-auto backdrop-blur-xl border rounded-full p-2 flex items-center shadow-2xl transition-all duration-300 hover:scale-[1.02] overflow-hidden
                     ${
                       darkMode
                         ? "bg-black/50 border-white/10 hover:bg-black/70"
@@ -164,6 +268,23 @@ const Portfolio = () => {
 
           {/* Actions */}
           <div className="flex items-center gap-2">
+            {/* Music Controls Toggle */}
+            <button
+              onClick={() => setIsVolumeOpen(true)}
+              className={`p-3 rounded-full transition-colors ${
+                darkMode
+                  ? "hover:bg-white/10 text-gray-400 hover:text-accent"
+                  : "hover:bg-black/5 text-gray-500 hover:text-accent"
+              }`}
+              aria-label="Open Music Controls"
+            >
+              {isMusicPlaying && volume > 0 ? (
+                <Volume2 size={18} />
+              ) : (
+                <VolumeX size={18} />
+              )}
+            </button>
+
             {/* Theme Toggle */}
             <button
               onClick={toggleTheme}
@@ -189,6 +310,78 @@ const Portfolio = () => {
               {isMenuOpen ? <X size={20} /> : <Menu size={20} />}
             </button>
           </div>
+
+          {/* Volume Overlay */}
+          {isVolumeVisible && (
+            <div
+              className={`absolute inset-0 flex items-center justify-between px-2 z-10 transition-all duration-300 rounded-full overflow-hidden ${
+                isVolumeOpen ? "opacity-100 scale-100" : "opacity-0 scale-95"
+              } ${darkMode ? "bg-zinc-900/95" : "bg-white/95"}`}
+            >
+              {/* Dynamic Fill Background */}
+              <div
+                className={`absolute inset-y-0 left-0 ${darkMode ? "bg-yellow-400/20" : "bg-green-700/20"} transition-[width] duration-300 ease-out`}
+                style={{ width: `${volume * 100}%` }}
+              />
+
+              <div className="flex items-center gap-4 w-full relative z-20 px-4">
+                <button
+                  onClick={toggleMusic}
+                  className={`p-2 rounded-full transition-colors z-20 ${
+                    darkMode
+                      ? "hover:bg-white/10 text-accent"
+                      : "hover:bg-black/5 text-green-700"
+                  }`}
+                >
+                  {isMusicPlaying && volume > 0 ? (
+                    <Volume2 size={24} />
+                  ) : (
+                    <VolumeX size={24} />
+                  )}
+                </button>
+                <div className="flex-1 flex items-center relative h-full min-h-[40px]">
+                  <input
+                    type="range"
+                    min="0"
+                    max="1"
+                    step="0.01"
+                    value={volume}
+                    onChange={handleVolumeInteraction}
+                    onPointerDown={() => {
+                      // Pause timeout while actively dragging
+                      if (volumeTimeoutRef.current)
+                        clearTimeout(volumeTimeoutRef.current);
+                    }}
+                    onPointerUp={() => {
+                      // Restart timeout after letting go
+                      volumeTimeoutRef.current = setTimeout(
+                        () => setIsVolumeOpen(false),
+                        4000,
+                      );
+                    }}
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-30 touch-none"
+                    aria-label="Volume Control"
+                  />
+                  <span
+                    className={`text-sm font-bold ml-4 relative z-20 ${darkMode ? "text-white" : "text-black"}`}
+                  >
+                    {Math.round(volume * 100)}%
+                  </span>
+                </div>
+              </div>
+              <button
+                onClick={() => setIsVolumeOpen(false)}
+                className={`p-2 rounded-full transition-colors relative z-20 ${
+                  darkMode
+                    ? "hover:bg-white/10 text-white"
+                    : "hover:bg-black/5 text-black"
+                }`}
+                aria-label="Close Volume Control"
+              >
+                <X size={20} />
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
@@ -221,6 +414,7 @@ const Portfolio = () => {
       )}
 
       {/* All Sections on Single Page */}
+      <audio ref={audioRef} src="/Summer%20Life.mp3" loop />
       <main>
         <section id="home" className="section-animate section-visible">
           <Home
