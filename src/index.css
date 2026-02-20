@@ -484,10 +484,6 @@ h1, h2, h3, h4, h5, h6 {
   width: max-content;
 }
 
-.marquee-track:hover {
-  animation-play-state: paused;
-}
-
 /* === SCROLLBAR === */
 ::-webkit-scrollbar {
   width: 10px;
@@ -631,10 +627,6 @@ h1, h2, h3, h4, h5, h6 {
 
 .animate-marquee {
   animation: marquee 30s linear infinite;
-}
-
-.animate-marquee:hover {
-  animation-play-state: paused;
 }
 
 /* Scroll Indicator Animation */

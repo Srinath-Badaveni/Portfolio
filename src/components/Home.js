@@ -14,39 +14,6 @@ const allSkills = [
 const Home = ({ setActiveSection, darkMode }) => {
   const [scrollY, setScrollY] = useState(0);
   const heroRef = useRef(null);
-  const particles = useRef([]);
-  const requestRef = useRef();
-
-  // Initialize Particles (Squares & Circles) starting from center
-  useEffect(() => {
-    const particleCount = 40;
-    const colors = darkMode
-      ? ["#EAE2B7", "#D62828", "#FCBF49", "#ffffff"]
-      : ["#2d6a4f", "#d62828", "#1b4332", "#000000"];
-
-    particles.current = [...Array(particleCount)].map((_, i) => ({
-      id: i,
-      // Start relatively central (30-70% of screen)
-      left: 50 + (Math.random() * 40 - 20),
-      top: 50 + (Math.random() * 20 - 10),
-      // Random drift direction (CSS vars)
-      tx: (Math.random() - 0.5) * 400, // Move up to 200px in any direction
-      ty: (Math.random() - 0.5) * 400,
-      size: Math.random() * 6 + 2,
-      duration: Math.random() * 7 + 8, // Faster drift (8-15s instead of 20s+)
-      delay: Math.random() * -20,
-      type: Math.random() > 0.8 ? "square" : "circle",
-      color: colors[Math.floor(Math.random() * colors.length)],
-    }));
-  }, [darkMode]);
-
-  // Constant Animation Loop (Floating Up)
-  // No JS loop needed as we use CSS animation for floatUp!
-  // But we can keep one for complex movement if desired, or skip.
-  const animate = () => {
-    // Rely on CSS animation for smooth, constant movement
-  };
-
   useEffect(() => {
     const handleScroll = () => setScrollY(window.scrollY);
     window.addEventListener("scroll", handleScroll);
@@ -62,45 +29,21 @@ const Home = ({ setActiveSection, darkMode }) => {
       ref={heroRef}
       style={{ minHeight: "100vh", paddingTop: "6rem", paddingBottom: "0" }}
     >
-      {/* 🌌 Center-Spawning Particles */}
+      {/* Vignette Overlay for depth */}
       <div
         className="fixed inset-0 pointer-events-none z-0 overflow-hidden"
-        style={{
-          opacity: heroOpacity,
-          perspective: "1000px",
-        }}
+        style={{ opacity: heroOpacity }}
       >
-        {/* Vignette Overlay for depth - Adapts to theme */}
         <div
           className={`absolute inset-0 bg-radial-gradient from-transparent opacity-80 ${
             darkMode ? "to-bg-primary" : "to-white"
           }`}
         />
-
-        {particles.current.map((p) => (
-          <div
-            key={p.id}
-            className="absolute"
-            style={{
-              left: `${p.left}%`,
-              top: `${p.top}%`,
-              width: `${p.size}px`,
-              height: `${p.size}px`,
-              backgroundColor: p.color,
-              borderRadius: p.type === "circle" ? "50%" : "0%",
-              opacity: 0, // Handled by animation
-              "--tx": `${p.tx}px`,
-              "--ty": `${p.ty}px`,
-              animation: `driftFromCenter ${p.duration}s infinite linear`,
-              animationDelay: `${p.delay}s`,
-            }}
-          />
-        ))}
       </div>
 
       <div className="container relative z-10 px-6 md:px-12">
         {/* ═══ HERO SECTION ═══ */}
-        <div className="flex flex-col justify-start items-start text-left min-h-screen pt-4 pb-4">
+        <div className="flex flex-col justify-start items-start text-left w-full pt-2 pb-2">
           {/* Main Headings */}
           <div className="space-y-6 max-w-7xl w-full relative">
             {/* Intro Label */}
@@ -209,32 +152,39 @@ const Home = ({ setActiveSection, darkMode }) => {
             </div>
           </div>
 
-          {/* 🌊 Skills Marquee — Full Width, Minimal Gap */}
-          <div className="w-full mt-6 border-t border-gray-800/30 pt-4">
-            <p className="text-xs font-bold tracking-[0.2em] opacity-50 uppercase mb-6">
+          {/* 🌊 Premium Skills Reels */}
+          <div className="w-full mt-6 pt-2 pb-4 relative z-10">
+            <p className="text-sm font-bold tracking-[0.3em] opacity-40 uppercase mb-4 text-center md:text-left text-accent">
               Technologies & Tools
             </p>
             <div className="relative w-full overflow-hidden mask-linear-fade">
               <div className="marquee-container overflow-hidden whitespace-nowrap">
                 <div
-                  className="flex gap-12 animate-marquee items-center font-display font-bold text-xl opacity-70"
+                  className="flex gap-8 animate-marquee items-center font-display"
                   style={{
-                    color: darkMode ? "#EAE2B7" : "#2d6a4f",
                     animationDirection: "reverse",
+                    animationDuration: "40s",
                   }}
                 >
-                  {allSkills.map((skill, i) => (
-                    <span key={i} className="flex items-center gap-3">
-                      <span className="w-1.5 h-1.5 bg-[#D62828] rounded-full"></span>
-                      {skill}
-                    </span>
-                  ))}
-                  {allSkills.map((skill, i) => (
-                    <span key={`dup-${i}`} className="flex items-center gap-3">
-                      <span className="w-1.5 h-1.5 bg-[#D62828] rounded-full"></span>
-                      {skill}
-                    </span>
-                  ))}
+                  {[...allSkills, ...allSkills, ...allSkills].map(
+                    (skill, i) => (
+                      <span
+                        key={i}
+                        className={`px-4 py-2 font-black tracking-widest text-xl md:text-2xl uppercase transition-all duration-300 transform-gpu hover:scale-110 hover:-translate-y-1 ${
+                          darkMode
+                            ? "text-gray-300 hover:text-white"
+                            : "text-gray-600 hover:text-black"
+                        }`}
+                        style={{
+                          textShadow: darkMode
+                            ? "0 4px 20px rgba(255, 255, 255, 0.1)"
+                            : "none",
+                        }}
+                      >
+                        {skill}
+                      </span>
+                    ),
+                  )}
                 </div>
               </div>
             </div>
