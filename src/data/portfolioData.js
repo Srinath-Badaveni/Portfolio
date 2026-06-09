@@ -354,7 +354,11 @@ export const certifications = [
 export const timeline = [
   {
     year: "2026",
-    events: ["CareConnect - Healthcare App", "Web Service Implementation"],
+    events: [
+      "Software Developer Intern at Ament Capital (Feb - Jun): Developed and integrated APIs with databases to enable reliable and efficient application functionality.",
+      "CareConnect - Healthcare App",
+      "Web Service Implementation",
+    ],
     gradient: "from-emerald-500 to-teal-600",
   },
   {

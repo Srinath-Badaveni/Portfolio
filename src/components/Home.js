@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
-import { ArrowUpRight, Github, Linkedin, ArrowRight } from "lucide-react";
-import { personalInfo, stats, skills, projects } from "../data/portfolioData";
+import { Github, ArrowRight } from "lucide-react";
+import { personalInfo, stats, skills } from "../data/portfolioData";
 
 // Collect all skills for marquee
 const allSkills = [
@@ -17,7 +17,10 @@ const Home = ({ setActiveSection, darkMode }) => {
   useEffect(() => {
     const handleScroll = () => setScrollY(window.scrollY);
     window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
   }, []);
 
   // Calculate opacity based on scroll (fade out completely by 500px or 1 viewport height)
@@ -89,26 +92,29 @@ const Home = ({ setActiveSection, darkMode }) => {
                 color: darkMode ? "#EAE2B7" : "#1a1a1a",
               }}
             >
-              {/* Line 1: Outline Style */}
               <span
-                className="block"
+                className="block animate-slide-up"
                 style={{
                   color: "transparent",
-                  WebkitTextStroke: darkMode ? "1px #EAE2B7" : "1px #1a1a1a",
-                  opacity: 0.8,
+                  WebkitTextStroke: darkMode
+                    ? "1px rgba(234, 226, 183, 0.5)"
+                    : "1px rgba(26, 26, 26, 0.5)",
+                  opacity: 0.9,
+                  animationDelay: "0.1s",
                 }}
               >
                 Building
               </span>
-
-              {/* Line 2: Solid Primary Style */}
-              <span className="block mt-[-0.2em]">Scalable Web</span>
-
-              {/* Line 3: Accent Style */}
               <span
-                className="block mt-[-0.2em]"
+                className="block mt-[-0.2em] animate-slide-up relative z-10"
+                style={{ animationDelay: "0.2s" }}
+              >
+                Scalable Web
+              </span>
+              <span
+                className="block mt-[-0.2em] animate-slide-up text-gradient"
                 style={{
-                  color: darkMode ? "#FCBF49" : "var(--color-accent)",
+                  animationDelay: "0.3s",
                 }}
               >
                 Experiences.
@@ -116,7 +122,10 @@ const Home = ({ setActiveSection, darkMode }) => {
             </h1>
 
             {/* Text (Left) + Button (Right) */}
-            <div className="flex flex-col md:flex-row md:justify-between md:items-end gap-6 mt-8 w-full">
+            <div
+              className="flex flex-col md:flex-row md:justify-between md:items-end gap-6 mt-8 w-full animate-fade-in"
+              style={{ animationDelay: "0.5s" }}
+            >
               <p
                 className="text-lg md:text-xl opacity-80 font-light leading-relaxed max-w-md"
                 style={{
@@ -128,22 +137,25 @@ const Home = ({ setActiveSection, darkMode }) => {
               <div className="flex gap-4 items-center shrink-0">
                 <button
                   onClick={() => setActiveSection("projects")}
-                  className="group px-8 py-4 bg-[#D62828] text-white font-bold rounded-full hover:bg-white hover:text-[#D62828] transition-all duration-300 shadow-lg flex items-center gap-3"
+                  className="group relative px-8 py-4 bg-[#D62828] text-white font-bold rounded-full overflow-hidden shadow-lg shadow-[#D62828]/30 flex items-center gap-3 hover:shadow-[#D62828]/50 transition-all duration-300 transform hover:-translate-y-1"
                 >
-                  See My Work
-                  <ArrowRight
-                    className="group-hover:translate-x-1 transition-transform"
-                    size={20}
-                  />
+                  <span className="relative z-10 flex items-center gap-2">
+                    See My Work
+                    <ArrowRight
+                      className="group-hover:translate-x-1.5 transition-transform duration-300"
+                      size={20}
+                    />
+                  </span>
+                  <div className="absolute inset-0 h-full w-full bg-white/20 scale-x-0 group-hover:scale-x-100 transform origin-left transition-transform duration-500 ease-out"></div>
                 </button>
                 <a
                   href={personalInfo.social.github}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={`p-4 rounded-full border transition-colors ${
+                  className={`p-4 rounded-full border transition-all duration-300 hover:-translate-y-1 ${
                     darkMode
-                      ? "border-white/20 text-white hover:bg-white/10"
-                      : "border-black/20 text-black hover:bg-black/5"
+                      ? "border-white/20 text-white hover:bg-white/10 hover:shadow-[0_0_15px_rgba(255,255,255,0.2)]"
+                      : "border-black/20 text-black hover:bg-black/5 hover:shadow-[0_0_15px_rgba(0,0,0,0.1)]"
                   }`}
                 >
                   <Github size={22} />
@@ -153,11 +165,22 @@ const Home = ({ setActiveSection, darkMode }) => {
           </div>
 
           {/* 🌊 Premium Skills Reels */}
-          <div className="w-full mt-6 pt-2 pb-4 relative z-10">
+          <div
+            className="w-full mt-6 pt-2 pb-4 relative z-10 animate-fade-in"
+            style={{ animationDelay: "0.7s" }}
+          >
             <p className="text-sm font-bold tracking-[0.3em] opacity-40 uppercase mb-4 text-center md:text-left text-accent">
               Technologies & Tools
             </p>
-            <div className="relative w-full overflow-hidden mask-linear-fade">
+            <div
+              className="relative w-full overflow-hidden"
+              style={{
+                WebkitMaskImage:
+                  "linear-gradient(to right, transparent, black 15%, black 85%, transparent)",
+                maskImage:
+                  "linear-gradient(to right, transparent, black 15%, black 85%, transparent)",
+              }}
+            >
               <div className="marquee-container overflow-hidden whitespace-nowrap">
                 <div
                   className="flex gap-8 animate-marquee items-center font-display"
@@ -212,8 +235,5 @@ const Home = ({ setActiveSection, darkMode }) => {
     </div>
   );
 };
-
-// Helper for pure opacity fade
-const fadeOutOnScroll = (y) => Math.max(0, 1 - y / 300);
 
 export default Home;

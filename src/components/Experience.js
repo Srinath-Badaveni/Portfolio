@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from "react";
-import { Award, Code, Rocket, GraduationCap, Trophy } from "lucide-react";
+import { Award, Code, Rocket, GraduationCap, Trophy, Briefcase } from "lucide-react";
 import { timeline } from "../data/portfolioData";
 
 // Map icon to each event for visual flair
@@ -26,6 +26,12 @@ const getEventIcon = (event) => {
     lower.includes("application")
   )
     return <Rocket size={18} />;
+  if (
+    lower.includes("intern") ||
+    lower.includes("developer") ||
+    lower.includes("developed")
+  )
+    return <Briefcase size={18} />;
   return <Code size={18} />;
 };
 
