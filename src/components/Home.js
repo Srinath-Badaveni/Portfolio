@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Github, ArrowRight } from "lucide-react";
 import { personalInfo, stats, skills } from "../data/portfolioData";
+import { motion, useMotionValue, useTransform, useSpring } from "framer-motion";
 
 // Collect all skills for marquee
 const allSkills = [
@@ -11,9 +12,68 @@ const allSkills = [
   ...skills.tools,
 ];
 
+// Magnetic Button Component
+const MagneticButton = ({ children, onClick, className }) => {
+  const ref = useRef(null);
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+
+  const mouseXSpring = useSpring(x, { stiffness: 150, damping: 15, mass: 0.1 });
+  const mouseYSpring = useSpring(y, { stiffness: 150, damping: 15, mass: 0.1 });
+
+  const handleMouseMove = (e) => {
+    if (!ref.current) return;
+    const { clientX, clientY } = e;
+    const { left, top, width, height } = ref.current.getBoundingClientRect();
+    const xPos = (clientX - (left + width / 2)) * 0.3;
+    const yPos = (clientY - (top + height / 2)) * 0.3;
+    x.set(xPos);
+    y.set(yPos);
+  };
+
+  const handleMouseLeave = () => {
+    x.set(0);
+    y.set(0);
+  };
+
+  return (
+    <motion.button
+      ref={ref}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      onClick={onClick}
+      style={{ x: mouseXSpring, y: mouseYSpring }}
+      className={className}
+      whileTap={{ scale: 0.95 }}
+    >
+      {children}
+    </motion.button>
+  );
+};
+
 const Home = ({ setActiveSection, darkMode }) => {
   const [scrollY, setScrollY] = useState(0);
   const heroRef = useRef(null);
+  
+  // Tilt effect for profile picture
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+  const rotateX = useTransform(y, [-100, 100], [10, -10]);
+  const rotateY = useTransform(x, [-100, 100], [-10, 10]);
+  
+  const handleProfileMouseMove = (e) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const xPos = e.clientX - rect.left - rect.width / 2;
+    const yPos = e.clientY - rect.top - rect.height / 2;
+    x.set(xPos);
+    y.set(yPos);
+  };
+
+  const handleProfileMouseLeave = () => {
+    x.set(0);
+    y.set(0);
+  };
+
   useEffect(() => {
     const handleScroll = () => setScrollY(window.scrollY);
     window.addEventListener("scroll", handleScroll);
@@ -23,8 +83,23 @@ const Home = ({ setActiveSection, darkMode }) => {
     };
   }, []);
 
-  // Calculate opacity based on scroll (fade out completely by 500px or 1 viewport height)
   const heroOpacity = Math.max(0, 1 - scrollY / (window.innerHeight * 0.8));
+
+  // Stagger variants
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.15
+      }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 30 },
+    show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 100, damping: 15 } }
+  };
 
   return (
     <div
@@ -47,44 +122,49 @@ const Home = ({ setActiveSection, darkMode }) => {
       <div className="container relative z-10 px-6 md:px-12">
         {/* ═══ HERO SECTION ═══ */}
         <div className="flex flex-col justify-start items-start text-left w-full pt-2 pb-2">
-          {/* Main Headings */}
-          <div className="space-y-6 max-w-7xl w-full relative">
+          
+          <motion.div 
+            className="space-y-6 max-w-7xl w-full relative"
+            variants={containerVariants}
+            initial="hidden"
+            animate="show"
+          >
             {/* Intro Label */}
-            <h2
-              className="text-sm md:text-base font-bold tracking-[0.3em] uppercase mb-6 animate-fade-in-up flex items-center gap-4"
-              style={{
-                color: darkMode ? "#FCBF49" : "var(--color-accent)",
-                animationDelay: "0.2s",
-              }}
+            <motion.h2
+              variants={itemVariants}
+              className="text-sm md:text-base font-bold tracking-[0.3em] uppercase mb-6 flex items-center gap-4"
+              style={{ color: darkMode ? "#FCBF49" : "var(--color-accent)" }}
             >
               <span className="w-12 h-[2px] bg-current opacity-50"></span>
               Hi, I'm Srinath Badaveni
-            </h2>
+            </motion.h2>
 
-            <div
-              className={`absolute right-0 -top-12 hidden md:block rounded-full overflow-hidden shadow-2xl transition-transform duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] hover:scale-125 cursor-pointer ${
+            <motion.div
+              variants={itemVariants}
+              className={`absolute right-0 -top-12 hidden md:block rounded-full overflow-hidden shadow-2xl cursor-pointer ${
                 !darkMode ? "border-4 border-gray-200" : ""
               }`}
               style={{
                 width: "14rem",
                 height: "14rem",
+                perspective: 1000,
               }}
             >
-              <img
+              <motion.img
                 src={personalInfo.profileImage}
                 alt={personalInfo.name}
                 className="w-full h-full object-cover"
+                style={{ rotateX, rotateY }}
+                onMouseMove={handleProfileMouseMove}
+                onMouseLeave={handleProfileMouseLeave}
+                whileHover={{ scale: 1.1 }}
+                transition={{ type: "spring", stiffness: 300, damping: 20 }}
               />
-            </div>
-
-            {/* Mobile Profile Photo - Inline/Different spot or hidden? 
-                  User said "top right to fill that empty space", usually implies desktop. 
-                  On mobile, spaces are tight. I'll hide it on mobile for now to avoid breaking layout 
-                  as per "dont disturb a single component". 
-              */}
+            </motion.div>
 
             {/* Main Headline */}
-            <h1
+            <motion.h1
+              variants={itemVariants}
               className="font-display font-black tracking-tighter mb-8 leading-none"
               style={{
                 fontSize: "clamp(3.5rem, 9vw, 8.5rem)",
@@ -93,38 +173,29 @@ const Home = ({ setActiveSection, darkMode }) => {
               }}
             >
               <span
-                className="block animate-slide-up"
+                className="block"
                 style={{
                   color: "transparent",
                   WebkitTextStroke: darkMode
                     ? "1px rgba(234, 226, 183, 0.5)"
                     : "1px rgba(26, 26, 26, 0.5)",
                   opacity: 0.9,
-                  animationDelay: "0.1s",
                 }}
               >
                 Building
               </span>
-              <span
-                className="block mt-[-0.2em] animate-slide-up relative z-10"
-                style={{ animationDelay: "0.2s" }}
-              >
+              <span className="block mt-[-0.2em] relative z-10">
                 Scalable Web
               </span>
-              <span
-                className="block mt-[-0.2em] animate-slide-up text-gradient"
-                style={{
-                  animationDelay: "0.3s",
-                }}
-              >
+              <span className="block mt-[-0.2em] text-gradient">
                 Experiences.
               </span>
-            </h1>
+            </motion.h1>
 
             {/* Text (Left) + Button (Right) */}
-            <div
-              className="flex flex-col md:flex-row md:justify-between md:items-end gap-6 mt-8 w-full animate-fade-in"
-              style={{ animationDelay: "0.5s" }}
+            <motion.div
+              variants={itemVariants}
+              className="flex flex-col md:flex-row md:justify-between md:items-end gap-6 mt-8 w-full"
             >
               <p
                 className="text-lg md:text-xl opacity-80 font-light leading-relaxed max-w-md"
@@ -135,9 +206,9 @@ const Home = ({ setActiveSection, darkMode }) => {
                 Passionate about building modern and scalable web applications.
               </p>
               <div className="flex gap-4 items-center shrink-0">
-                <button
+                <MagneticButton
                   onClick={() => setActiveSection("projects")}
-                  className="group relative px-8 py-4 bg-[#D62828] text-white font-bold rounded-full overflow-hidden shadow-lg shadow-[#D62828]/30 flex items-center gap-3 hover:shadow-[#D62828]/50 transition-all duration-300 transform hover:-translate-y-1"
+                  className="group relative px-8 py-4 bg-[#D62828] text-white font-bold rounded-full overflow-hidden shadow-lg shadow-[#D62828]/30 flex items-center gap-3 hover:shadow-[#D62828]/50 transition-colors"
                 >
                   <span className="relative z-10 flex items-center gap-2">
                     See My Work
@@ -147,7 +218,7 @@ const Home = ({ setActiveSection, darkMode }) => {
                     />
                   </span>
                   <div className="absolute inset-0 h-full w-full bg-white/20 scale-x-0 group-hover:scale-x-100 transform origin-left transition-transform duration-500 ease-out"></div>
-                </button>
+                </MagneticButton>
                 <a
                   href={personalInfo.social.github}
                   target="_blank"
@@ -161,13 +232,15 @@ const Home = ({ setActiveSection, darkMode }) => {
                   <Github size={22} />
                 </a>
               </div>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
 
           {/* 🌊 Premium Skills Reels */}
-          <div
-            className="w-full mt-6 pt-2 pb-4 relative z-10 animate-fade-in"
-            style={{ animationDelay: "0.7s" }}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.8, duration: 1 }}
+            className="w-full mt-6 pt-2 pb-4 relative z-10"
           >
             <p className="text-sm font-bold tracking-[0.3em] opacity-40 uppercase mb-4 text-center md:text-left text-accent">
               Technologies & Tools
@@ -211,11 +284,17 @@ const Home = ({ setActiveSection, darkMode }) => {
                 </div>
               </div>
             </div>
-          </div>
+          </motion.div>
         </div>
 
         {/* Minimal Stats - Adapts to Dark/Light */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-12 mt-32 border-t border-gray-800 pt-16">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8 }}
+          className="grid grid-cols-2 md:grid-cols-4 gap-12 mt-32 border-t border-gray-800 pt-16"
+        >
           {stats.map((stat, idx) => (
             <div key={idx} className="text-center space-y-4">
               <div
@@ -230,7 +309,7 @@ const Home = ({ setActiveSection, darkMode }) => {
               </div>
             </div>
           ))}
-        </div>
+        </motion.div>
       </div>
     </div>
   );

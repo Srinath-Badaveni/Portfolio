@@ -118,12 +118,23 @@ body {
   font-size: var(--text-base);
   line-height: 1.6;
   color: var(--color-text-primary);
-  background-color: #000000;
-  /* Very subtle top-center light gold glow, otherwise totally black */
-  background-image: radial-gradient(circle at 50% 0%, rgba(255, 215, 0, 0.08) 0%, transparent 40%);
+  background-color: #030303;
+  /* Deep Space Mesh Gradient Background */
+  background-image: 
+    radial-gradient(circle at 15% 50%, rgba(20, 0, 40, 0.4), transparent 30%),
+    radial-gradient(circle at 85% 30%, rgba(0, 30, 40, 0.4), transparent 30%),
+    radial-gradient(circle at 50% 0%, rgba(255, 215, 0, 0.05) 0%, transparent 40%);
   background-attachment: fixed;
   transition: background-color var(--transition-base), color var(--transition-base);
   overflow-x: hidden;
+  cursor: none; /* Hide default cursor for custom cursor */
+}
+
+/* Fallback for devices without fine pointer */
+@media (pointer: coarse) {
+  body {
+    cursor: auto;
+  }
 }
 
 [data-theme="light"] body {
@@ -750,3 +761,67 @@ h1, h2, h3, h4, h5, h6 {
   opacity: 1;
   transform: translateY(0);
 }
+
+/* === GLASSMORPHISM & PREMIUM UTILITIES === */
+.glass-panel {
+  background: rgba(25, 25, 25, 0.25);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="light"] .glass-panel {
+  background: rgba(255, 255, 255, 0.4);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+/* === CUSTOM CURSOR === */
+.custom-cursor-dot {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 8px;
+  height: 8px;
+  background-color: var(--color-accent);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9999;
+  transform: translate(-50%, -50%);
+  transition: width 0.2s, height 0.2s;
+}
+
+.custom-cursor-ring {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--color-accent);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9998;
+  transform: translate(-50%, -50%);
+  transition: width 0.2s, height 0.2s, background-color 0.2s;
+}
+
+.cursor-hover .custom-cursor-dot {
+  width: 0;
+  height: 0;
+}
+
+.cursor-hover .custom-cursor-ring {
+  width: 60px;
+  height: 60px;
+  background-color: rgba(255, 215, 0, 0.1);
+  border-color: rgba(255, 215, 0, 0.5);
+  backdrop-filter: grayscale(1);
+}
+
+/* Disable custom cursor for touch devices */
+@media (pointer: coarse) {
+  .custom-cursor-dot, .custom-cursor-ring {
+    display: none;
+  }
+}
+

@@ -1,6 +1,7 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Code2, Globe, Database, Wrench, Brain, Cpu } from "lucide-react";
 import { skills, certifications } from "../data/portfolioData";
+import { motion } from "framer-motion";
 
 // Category config with icons and accent colors
 const categories = [
@@ -49,22 +50,20 @@ const categories = [
 ];
 
 const Skills = () => {
-  // Animate skill cards on scroll
-  useEffect(() => {
-    const cards = document.querySelectorAll(".skill-card-anim");
-    const obs = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("skill-card-visible");
-          }
-        });
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
       },
-      { threshold: 0.1 },
-    );
-    cards.forEach((el) => obs.observe(el));
-    return () => obs.disconnect();
-  }, []);
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 30, scale: 0.9 },
+    show: { opacity: 1, y: 0, scale: 1, transition: { type: "spring", stiffness: 100 } },
+  };
 
   return (
     <div className="section">
@@ -73,7 +72,13 @@ const Skills = () => {
         style={{ maxWidth: "1200px", margin: "0 auto", padding: "3rem 1.5rem" }}
       >
         {/* Header */}
-        <div style={{ marginBottom: "5rem" }}>
+        <motion.div 
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          style={{ marginBottom: "5rem" }}
+        >
           <p
             style={{
               fontSize: "0.875rem",
@@ -100,46 +105,48 @@ const Skills = () => {
             Technical <br />
             <span className="text-accent">Expertise.</span>
           </h1>
-        </div>
+        </motion.div>
 
         {/* Skills Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <motion.div 
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, margin: "-50px" }}
+          className="grid md:grid-cols-2 lg:grid-cols-3 gap-6"
+        >
           {categories.map((cat, idx) => (
-            <div
+            <motion.div
+              variants={itemVariants}
+              whileHover={{ 
+                y: -8, 
+                boxShadow: `0 20px 40px ${cat.color}20`,
+                borderColor: cat.color
+              }}
               key={cat.key}
-              className="skill-card-anim group"
+              className="glass-panel"
               style={{
-                transitionDelay: `${idx * 0.1}s`,
-                border: "1px solid var(--color-border)",
-                borderRadius: "16px",
+                borderRadius: "20px",
                 padding: "2rem",
-                background: "var(--color-bg-secondary)",
-                transition: "all 0.4s cubic-bezier(0.16, 1, 0.3, 1)",
                 cursor: "default",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.borderColor = cat.color;
-                e.currentTarget.style.transform = "translateY(-4px)";
-                e.currentTarget.style.boxShadow = `0 8px 30px ${cat.color}15`;
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.borderColor = "var(--color-border)";
-                e.currentTarget.style.transform = "translateY(0)";
-                e.currentTarget.style.boxShadow = "none";
+                transition: "border-color 0.3s"
               }}
             >
               {/* Category Header */}
               <div className="flex items-center gap-3 mb-6">
-                <div
+                <motion.div
+                  whileHover={{ rotate: 360, scale: 1.1 }}
+                  transition={{ duration: 0.5 }}
                   style={{
                     color: cat.color,
-                    padding: "0.5rem",
-                    borderRadius: "10px",
+                    padding: "0.6rem",
+                    borderRadius: "12px",
                     background: `${cat.color}15`,
+                    boxShadow: `0 0 20px ${cat.color}20`
                   }}
                 >
                   {cat.icon}
-                </div>
+                </motion.div>
                 <h3
                   style={{
                     fontSize: "1.1rem",
@@ -157,41 +164,42 @@ const Skills = () => {
               {/* Skill Items */}
               <div className="flex flex-wrap gap-2">
                 {cat.items.map((item, i) => (
-                  <span
+                  <motion.span
                     key={i}
+                    whileHover={{ 
+                      scale: 1.1, 
+                      y: -2,
+                      backgroundColor: `${cat.color}20`,
+                      borderColor: cat.color,
+                      color: cat.color
+                    }}
+                    transition={{ type: "spring", stiffness: 400, damping: 10 }}
                     style={{
                       fontSize: "0.85rem",
-                      padding: "0.4rem 0.9rem",
+                      padding: "0.5rem 1rem",
                       borderRadius: "999px",
-                      border: "1px solid var(--color-border)",
+                      border: "1px solid rgba(255,255,255,0.1)",
+                      background: "rgba(255,255,255,0.02)",
                       color: "var(--color-text-secondary)",
-                      transition: "all 0.3s",
                       cursor: "default",
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.borderColor = cat.color;
-                      e.currentTarget.style.color = cat.color;
-                      e.currentTarget.style.background = `${cat.color}10`;
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.borderColor = "var(--color-border)";
-                      e.currentTarget.style.color =
-                        "var(--color-text-secondary)";
-                      e.currentTarget.style.background = "transparent";
                     }}
                   >
                     {item}
-                  </span>
+                  </motion.span>
                 ))}
               </div>
-            </div>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
 
         {/* Certifications */}
-        <div
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.2 }}
           className="mt-20 pt-16 border-t"
-          style={{ borderColor: "var(--color-border)" }}
+          style={{ borderColor: "rgba(255,255,255,0.1)" }}
         >
           <h3
             style={{
@@ -207,24 +215,15 @@ const Skills = () => {
           </h3>
           <div className="grid md:grid-cols-2 gap-4">
             {certifications.map((cert) => (
-              <div
+              <motion.div
+                whileHover={{ scale: 1.02, x: 10, borderColor: "var(--color-accent)" }}
                 key={cert.id}
-                className="group skill-card-anim"
+                className="glass-panel"
                 style={{
                   padding: "1.5rem",
-                  border: "1px solid var(--color-border)",
-                  borderRadius: "12px",
-                  background: "var(--color-bg-secondary)",
-                  transition: "all 0.3s",
+                  borderRadius: "16px",
                   cursor: "default",
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.borderColor = "var(--color-accent)";
-                  e.currentTarget.style.transform = "translateX(4px)";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.borderColor = "var(--color-border)";
-                  e.currentTarget.style.transform = "translateX(0)";
+                  transition: "border-color 0.3s"
                 }}
               >
                 <div className="flex items-start justify-between gap-4">
@@ -233,7 +232,7 @@ const Skills = () => {
                       style={{
                         fontWeight: 600,
                         color: "var(--color-text-primary)",
-                        marginBottom: "0.25rem",
+                        marginBottom: "0.35rem",
                       }}
                     >
                       {cert.title}
@@ -253,15 +252,18 @@ const Skills = () => {
                       fontWeight: 700,
                       color: "var(--color-accent)",
                       whiteSpace: "nowrap",
+                      background: "rgba(255,215,0,0.1)",
+                      padding: "0.3rem 0.6rem",
+                      borderRadius: "6px"
                     }}
                   >
                     {cert.year}
                   </span>
                 </div>
-              </div>
+              </motion.div>
             ))}
           </div>
-        </div>
+        </motion.div>
       </div>
     </div>
   );

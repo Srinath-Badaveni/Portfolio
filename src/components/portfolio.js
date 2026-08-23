@@ -5,6 +5,7 @@ import About from "./About";
 import Projects from "./Projects";
 import Skills from "./Skills";
 import Experience from "./Experience";
+import WorkExperience from "./WorkExperience";
 import Contact from "./Contact";
 
 const Portfolio = () => {
@@ -130,18 +131,19 @@ const Portfolio = () => {
 
   const navItems = [
     { id: "about", label: "About" },
-    { id: "projects", label: "Work" },
+    { id: "projects", label: "Projects" },
+    { id: "work-experience", label: "Experience" },
     { id: "skills", label: "Expertise" },
     { id: "experience", label: "Journey" },
     { id: "contact", label: "Contact" },
   ];
 
-  // Scroll-spy: update active nav based on which section is visible
   useEffect(() => {
     const sectionIds = [
       "home",
       "about",
       "projects",
+      "work-experience",
       "skills",
       "experience",
       "contact",
@@ -427,6 +429,9 @@ const Portfolio = () => {
         </section>
         <section id="projects" className="section-animate">
           <Projects />
+        </section>
+        <section id="work-experience" className="section-animate">
+          <WorkExperience />
         </section>
         <section id="skills" className="section-animate">
           <Skills />
